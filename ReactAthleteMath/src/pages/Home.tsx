@@ -10,7 +10,7 @@ const Home: React.FC = () => {
     { title: 'Pyramid', route: '/pyramid', img: '/pyramid.png' },
     { title: 'Ladder', route: '/ladder', img: '/ladder.png' },
     { title: 'Descending Ladder', route: '/descending', img: '/descendingladder.png' },
-    { title: 'Even Sets', route: '/even-sets', img: '/straightsets.png' },
+    { title: 'Even Sets', route: '/even-sets', img: '/straightsets.png' }, //TODO: change straight sets graphic
   ];
 
   return (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import WorkoutModeSelector from '../components/WorkoutModeSelector';
 import GoalLogicSelector from '../components/GoalLogicSelector';
-import PyramidWorkoutCalculator from '../components/PyramidWorkoutCalculator';
+import PyramidWorkoutCalculator from '../utils/PyramidWorkoutCalculator';
 import WorkoutBaseFields from '../components/WorkoutBaseFields';
 import { calculatePeakStepFromGoal } from '../components/CalculatePeakStepFromGoal';
 
