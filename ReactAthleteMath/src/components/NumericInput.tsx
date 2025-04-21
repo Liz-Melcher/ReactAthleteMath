@@ -7,6 +7,7 @@ interface NumericInputProps {
   value: number;
   onChange: (value: number) => void;
   min?: number;
+  step?: number; // New optional prop to control decimal precision
 }
 
 const NumericInput: React.FC<NumericInputProps> = ({
@@ -14,22 +15,23 @@ const NumericInput: React.FC<NumericInputProps> = ({
   controlId,
   value,
   onChange,
-  min = 0
+  min = 0,
+  step
 }) => {
   return (
     <Form.Group controlId={controlId} className="mb-3">
       <Form.Label>{label}</Form.Label>
-        <Form.Control
-            type="text" // ← not 'number'
-            inputMode="decimal"
-            pattern="[0-9]*[.,]?[0-9]*"
-            value={value}
-            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-            onWheel={(e) => e.currentTarget.blur()}
-            autoComplete="off"
-            min={min}
-            />
-
+      <Form.Control
+        type="text"
+        inputMode="decimal"
+        pattern="[0-9]*[.,]?[0-9]*"
+        value={value}
+        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onWheel={(e) => e.currentTarget.blur()}
+        autoComplete="off"
+        min={min}
+        step={step}
+      />
     </Form.Group>
   );
 };

@@ -78,7 +78,8 @@ const PyramidWorkoutCalculator: React.FC<PyramidWorkoutCalculatorProps> = ({
       <Card.Text><strong>Peak Step:</strong> {peakStep} {unit}</Card.Text>
       <Card.Text><strong>Increment:</strong> {increment} {unit} per step</Card.Text>
       <Card.Text><strong>Total Steps:</strong> {totalSteps}</Card.Text>
-      <Card.Text><strong>Working {unit}:</strong> {totalReps}</Card.Text>
+      <Card.Text><strong>Working {unit}:</strong> {totalReps.toFixed(unit === 'miles' ? 2 : unit === 'kilometers' ? 3 : 0)}</Card.Text>
+
       <Card.Text><strong>Total {unit} (including rest):</strong> {totalWithRest}</Card.Text>
       {warning && <Card.Text className="text-warning">{warning}</Card.Text>}
 

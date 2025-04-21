@@ -4,8 +4,7 @@ import WorkoutModeSelector from '../components/WorkoutModeSelector';
 import GoalLogicSelector from '../components/GoalLogicSelector';
 import PyramidWorkoutCalculator from '../utils/PyramidWorkoutCalculator';
 import WorkoutBaseFields from '../components/WorkoutBaseFields';
-import { calculatePeakStepFromGoal } from '../components/CalculatePeakStepFromGoal';
-
+import { calculatePeakStepFromGoal } from '../utils/CalculatePeakStepFromGoal';
 type UnitType = 'laps' | 'reps' | 'meters' | 'miles' | 'kilometers' | 'time';
 type WorkoutMode = 'base' | 'top' | 'goal';
 type GoalDirection = 'gte' | 'lte';
@@ -17,15 +16,22 @@ const Pyramid: React.FC = () => {
   const [lowestStep, setLowestStep] = useState<number | undefined>(undefined);
   const [highestStep, setHighestStep] = useState<number | undefined>(undefined);
   const [goal, setGoal] = useState<number | undefined>(undefined);
+  const [numberOfSets, setNumberOfSets] = useState<number | undefined>(undefined);
   const [workoutMode, setWorkoutMode] = useState<WorkoutMode>('top');
   const [goalDirection, setGoalDirection] = useState<GoalDirection>('gte');
 
   useEffect(() => {
-    if (workoutMode === 'goal' && goal !== undefined && goal > 0 && changePerStep !== undefined && changePerStep > 0) {
+    if (
+      workoutMode === 'goal' &&
+      goal !== undefined &&
+      goal > 0 &&
+      changePerStep !== undefined &&
+      changePerStep > 0
+    ) {
       const peak = calculatePeakStepFromGoal(goal, changePerStep, goalDirection);
       setHighestStep(peak);
     }
-  }, [goal, changePerStep, workoutMode]);
+  }, [goal, changePerStep, workoutMode, goalDirection]);
 
   const isReadyForCalculation =
     unit &&
@@ -76,6 +82,9 @@ const Pyramid: React.FC = () => {
         onLowestStepChange={setLowestStep}
         highestStep={highestStep ?? 0}
         onHighestStepChange={setHighestStep}
+        numberOfSets={numberOfSets ?? 0}
+        onNumberOfSetsChange={setNumberOfSets}
+        setsRequired={true}
         mode={workoutMode}
       />
 
