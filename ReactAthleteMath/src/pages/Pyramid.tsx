@@ -1,102 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Form } from 'react-bootstrap';
-import WorkoutModeSelector from '../components/WorkoutModeSelector';
-import GoalLogicSelector from '../components/GoalLogicSelector';
-import PyramidWorkoutCalculator from '../utils/PyramidWorkoutCalculator';
-import WorkoutBaseFields from '../components/WorkoutBaseFields';
-import { calculatePeakStepFromGoal } from '../utils/CalculatePeakStepFromGoal';
-type UnitType = 'laps' | 'reps' | 'meters' | 'miles' | 'kilometers' | 'time';
-type WorkoutMode = 'base' | 'top' | 'goal';
-type GoalDirection = 'gte' | 'lte';
+import React, { useState } from 'react';
+import WorkoutInputSelector from '../components/WorkoutInputSelector';
+import { Card } from 'react-bootstrap';
+import { convertToBaseUnits } from '../utils/unitConversion';
+import { buildPyramidFromBaseStep } from '../utils/buildPyramidFromBaseStep';
 
-const Pyramid: React.FC = () => {
-  const [unit, setUnit] = useState<UnitType>('reps');
-  const [restValue, setRestValue] = useState<number | undefined>(undefined);
-  const [changePerStep, setChangePerStep] = useState<number | undefined>(undefined);
-  const [lowestStep, setLowestStep] = useState<number | undefined>(undefined);
-  const [highestStep, setHighestStep] = useState<number | undefined>(undefined);
-  const [goal, setGoal] = useState<number | undefined>(undefined);
-  const [numberOfSets, setNumberOfSets] = useState<number | undefined>(undefined);
-  const [workoutMode, setWorkoutMode] = useState<WorkoutMode>('top');
-  const [goalDirection, setGoalDirection] = useState<GoalDirection>('gte');
+const PyramidWorkout: React.FC = () => {
+  const [workoutData, setWorkoutData] = useState<any | null>(null);
 
-  useEffect(() => {
-    if (
-      workoutMode === 'goal' &&
-      goal !== undefined &&
-      goal > 0 &&
-      changePerStep !== undefined &&
-      changePerStep > 0
-    ) {
-      const peak = calculatePeakStepFromGoal(goal, changePerStep, goalDirection);
-      setHighestStep(peak);
-    }
-  }, [goal, changePerStep, workoutMode, goalDirection]);
+  const handleFormSubmit = (formData: any) => {
+    const { firstStep, increase, rest, topStep, unit } = formData;
+    
+    const firstStepBase = convertToBaseUnits(Number(firstStep), unit);
+    const increaseBase = convertToBaseUnits(Number(increase), unit);
+    const restBase = Number(rest); // Assuming rest is already in correct base (laps)
+    const topStepBase = convertToBaseUnits(Number(topStep), unit);
 
-  const isReadyForCalculation =
-    unit &&
-    restValue !== undefined &&
-    changePerStep !== undefined &&
-    (
-      (workoutMode === 'goal' && goal !== undefined && goal > 0) ||
-      (workoutMode === 'top' && highestStep !== undefined && highestStep > 0) ||
-      (workoutMode === 'base' &&
-        lowestStep !== undefined &&
-        highestStep !== undefined &&
-        lowestStep > 0 &&
-        highestStep > 0)
-    );
+    console.log('First Step in Base Units:', firstStepBase);
+    console.log('Increase in Base Units:', increaseBase);
+
+    // Build the pyramid using base values
+    const pyramidSteps = buildPyramidFromBaseStep({
+      firstStep: firstStepBase.valueInBaseUnits,
+      increase: increaseBase.valueInBaseUnits,
+      restPerStep: restBase, // assuming rest doesn't need conversion
+      topStep: topStepBase.valueInBaseUnits,
+    });
+
+    console.log('Pyramid Steps:', pyramidSteps);
+    setWorkoutData(pyramidSteps);
+  };
 
   return (
-    <Container className="py-4">
-      <h2 className="mb-4">Pyramid Workout Builder</h2>
+    <div className="container p-4">
+      <h1 className="mb-4 text-center">Pyramid Workout Builder</h1>
 
-      <WorkoutModeSelector workoutMode={workoutMode} onChange={setWorkoutMode} />
+      <WorkoutInputSelector onSubmit={handleFormSubmit} />
 
-      {workoutMode === 'goal' && (
-        <>
-          <GoalLogicSelector goalDirection={goalDirection} onChange={setGoalDirection} />
-          <Form.Group controlId="goalInput" className="mb-3">
-            <Form.Label>Goal</Form.Label>
-            <Form.Control
-              type="text"
-              inputMode="decimal"
-              pattern="[0-9]*[.,]?[0-9]*"
-              value={goal ?? ''}
-              onChange={(e) => setGoal(parseFloat(e.target.value) || undefined)}
-              onWheel={(e) => e.currentTarget.blur()}
-              autoComplete="off"
-            />
-          </Form.Group>
-        </>
+      {workoutData && (
+        <Card className="mt-4 p-3">
+          <h2>Workout Preview</h2>
+          <pre>{JSON.stringify(workoutData, null, 2)}</pre>
+          {/* 🚧 Later: display the actual pyramid breakdown here */}
+        </Card>
       )}
-
-      <WorkoutBaseFields
-        unit={unit}
-        onUnitChange={setUnit}
-        restValue={restValue ?? 0}
-        onRestChange={setRestValue}
-        changePerStep={changePerStep ?? 0}
-        onChangePerStep={setChangePerStep}
-        lowestStep={lowestStep ?? 0}
-        onLowestStepChange={setLowestStep}
-        highestStep={highestStep ?? 0}
-        onHighestStepChange={setHighestStep}
-        numberOfSets={numberOfSets ?? 0}
-        onNumberOfSetsChange={setNumberOfSets}
-        setsRequired={true}
-        mode={workoutMode}
-      />
-
-      {isReadyForCalculation && highestStep !== undefined && changePerStep !== undefined && (
-        <PyramidWorkoutCalculator
-          peakStep={highestStep}
-          increment={changePerStep}
-          unit={unit}
-        />
-      )}
-    </Container>
+    </div>
   );
 };
 
-export default Pyramid;
+export default PyramidWorkout;
